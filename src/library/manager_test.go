@@ -23,4 +23,17 @@ func TestOps(t *testing.T) {
 	if m == nil {
 		t.Error("MusicManager.Find() failed.")
 	}
+	if m.Id != m0.Id || m.Name != m0.Name || m.Artist != m0.Artist || m.Source != m0.Source || m.Type != m0.Type {
+		t.Error("MusicManager.Find() failed. Found item mismatched.")
+	}
+
+	m, err := mm.Get(0)
+	if m == nil {
+		t.Error("Mussicmanager.Get() failed.", err)
+	}
+
+	m = mm.Remove(0)
+	if m == nil || mm.Len() != 0 {
+		t.Error("MusicManager.Remove() failed.", err)
+	}
 }

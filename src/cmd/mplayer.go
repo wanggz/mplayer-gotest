@@ -3,7 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"library"
+	"mp"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -15,12 +18,37 @@ func handleLibCommands(tokens []string) {
 	switch tokens[1] {
 	case "list":
 		for i := 0; i < lib.Len(); i++ {
-
+			e, _ := lib.Get(i)
+			fmt.Println(i+1, ":", e.Name, e.Artist, e.Source, e.Type)
 		}
 	case "add":
+		if len(tokens) == 6 {
+			lib.Add(&library.MusicEntry{strconv.Itoa(id), tokens[2], tokens[3], tokens[4], tokens[5]})
+			id++
+		} else {
+			fmt.Println("USAGE: lib add <name> <artist> <source> <type>")
+		}
 	case "remove":
+		if len(tokens) == 3 {
+			lib.RemoveByName(tokens[2])
+		} else {
+			fmt.Println("USAGE: lib remove <name>")
+		}
 	default:
+		fmt.Println("Unrecognized lib command:", tokens)
 	}
+}
+
+func handlePlayCommand(tokens []string) {
+	if len(tokens) != 2 {
+		fmt.Println("USAGE: play <name>")
+		return
+	}
+	e := lib.Find(tokens[1])
+	if e == nil {
+		fmt.Println("The music", tokens[1], "does not exits.")
+	}
+	mp.Play(e.Source, e.Type)
 }
 
 func main() {
@@ -32,7 +60,7 @@ func main() {
 		play <name> -- Play the specified music
 	`)
 
-	//lib = library.NewMusicmanager()
+	lib = library.NewMusicManager()
 
 	r := bufio.NewReader(os.Stdin)
 
@@ -48,9 +76,9 @@ func main() {
 		tokens := strings.Split(line, " ")
 
 		if tokens[0] == "lib" {
-
+			handleLibCommands(tokens)
 		} else if tokens[0] == "play" {
-
+			handlePlayCommand(tokens)
 		} else {
 			fmt.Println("Unrecognized command:", tokens[0])
 		}
